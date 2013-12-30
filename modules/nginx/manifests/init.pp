@@ -22,7 +22,7 @@ define nginx::vhost(
     $server_name = '*.dev',
     $template = 'nginx/dev.erb',
     $site = 'dev',
-    $root = '/home/vagrant/$host/web'
+    $root = '/srv/$host/web'
 ) {
     $sitesavailable = '/etc/nginx/sites-available'
     $sitesenabled = '/etc/nginx/sites-enabled'

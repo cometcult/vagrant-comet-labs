@@ -42,3 +42,13 @@ Start Vagrant with:
 vagrant up --provision
 ```
 Keep in mind that the first start may take a while. If you're done with development you can [suspend the VM](http://docs.vagrantup.com/v2/getting-started/teardown.html)
+
+4) Symfony
+----------
+
+When working with Symfony apps you have to allow access by doing:
+
+```bash
+sed -i 's/\(::1\)/192.168.33.1/' web/app_dev.php
+sed -i 's/\(::1\)/192.168.33.1/' web/config.php
+```

@@ -1,0 +1,9 @@
+[submodule "modules/apt"]
+	path = modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt
+[submodule "modules/mongodb"]
+	path = modules/mongodb
+	url = git@github.com:puppetlabs/puppetlabs-mongodb.git
+[submodule "modules/composer"]
+	path = modules/composer
+	url = git@github.com:willdurand/puppet-composer.git

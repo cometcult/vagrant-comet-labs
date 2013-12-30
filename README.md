@@ -28,11 +28,17 @@ cat .puppet/Vagrantfile |
     sed -e 's/manifests_path = "manifests"/manifests_path = ".puppet\/manifests"/g' > Vagrantfile
 ```
 
+Add to your /etc/hosts
+
+```bash
+192.168.33.10 comet-labs.dev
+```
+
 3) Vagrant
 ----------
 
 Start Vagrant with:
 ```bash
-vagrant up
+vagrant up --provision
 ```
 Keep in mind that the first start may take a while. If you're done with development you can [suspend the VM](http://docs.vagrantup.com/v2/getting-started/teardown.html)

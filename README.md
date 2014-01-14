@@ -2,9 +2,9 @@ Vagrant & Puppet setup for Comet Labs
 
 1) Requirements
 ---------------
-* [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* [Vagrant](http://vagrantup.com/)
-* [Puppet](http://docs.puppetlabs.com/guides/installation.html)
+* [VirtualBox 4.3.x](https://www.virtualbox.org/wiki/Downloads)
+* [Vagrant 1.4.x](http://vagrantup.com/)
+* [Puppet 3.3.x](http://docs.puppetlabs.com/guides/installation.html)
 * NFS (This comes pre-installed on Mac OS X, and is typically a simple package install on Linux)
 
 

@@ -46,9 +46,14 @@ Keep in mind that the first start may take a while. If you're done with developm
 4) Symfony
 ----------
 
-When working with Symfony apps you have to allow access by doing:
+To check status of your local Symfony project visit:
 
 ```bash
-sed -i 's/\(::1\)/192.168.33.1/' web/app_dev.php
-sed -i 's/\(::1\)/192.168.33.1/' web/config.php
+http://comet-labs.dev/app_dev.php
 ```
+and
+
+```bash
+http://comet-labs.dev/app_dev.php/demo/
+```
+

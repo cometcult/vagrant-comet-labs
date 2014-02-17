@@ -21,7 +21,8 @@ Create a Vagrantfile and configure manifests and module paths. You can use provi
 Please remember to check if your .puppet/ has most recent master branch checked out.
 
 ```bash
-cat .puppet/Vagrantfile | sed -e 's/puphpet\//.puppet\/puphpet\//g' > Vagrantfile
+cat .puppet/Vagrantfile | sed -e "s/puphpet\//.puppet\/puphpet\//g" |
+	sed -e "s/#{data\['vm'\]\['provision'\]\['puppet'\]\['manifests_path'\]}/.puppet\/puphpet\/puppet/g" > Vagrantfile
 ```
 
 3) Vagrant

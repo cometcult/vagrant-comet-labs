@@ -11,19 +11,7 @@ Vagrant & Puppet setup for Comet Labs
 2) Installing
 -------------
 
-Inside your project's directory clone the setup:
-
-```bash
-git clone git@github.com:cometcult/vagrant-comet-labs.git .puppet
-```
-
-Create a Vagrantfile and configure manifests and module paths. You can use provided example:
-Please remember to check if your .puppet/ has most recent master branch checked out.
-
-```bash
-cat .puppet/Vagrantfile | sed -e "s/puphpet\//.puppet\/puphpet\//g" |
-	sed -e "s/#{data\['vm'\]\['provision'\]\['puppet'\]\['manifests_path'\]}/.puppet\/puphpet\/puppet/g" > Vagrantfile
-```
+git archive this repository and included in your Comet Labs project
 
 3) Vagrant
 ----------

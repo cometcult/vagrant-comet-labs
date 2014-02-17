@@ -15,8 +15,6 @@ Inside your project's directory clone the setup:
 
 ```bash
 git clone git@github.com:cometcult/vagrant-comet-labs.git .puppet
-cd .puppet
-git submodule update --init --recursive
 ```
 
 Create a Vagrantfile and configure manifests and module paths. You can use provided example:

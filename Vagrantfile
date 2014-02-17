@@ -1,67 +1,101 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+require 'yaml'
 
-# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
-VAGRANTFILE_API_VERSION = "2"
+dir = File.dirname(File.expand_path(__FILE__))
 
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # All Vagrant configuration is done here. The most common configuration
-  # options are documented and commented below. For a complete reference,
-  # please see the online documentation at vagrantup.com.
+configValues = YAML.load_file("#{dir}/puphpet/config.yaml")
+data = configValues['vagrantfile-local']
 
-  # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "precise64"
+Vagrant.configure("2") do |config|
+  config.vm.box = "#{data['vm']['box']}"
+  config.vm.box_url = "#{data['vm']['box_url']}"
 
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
-  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network :forwarded_port, guest: 80, host: 8080
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  config.vm.network :private_network, ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network :public_network
-
-  # If true, then any SSH connections made will enable agent forwarding.
-  # Default value: false
-  # config.ssh.forward_agent = true
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  config.vm.synced_folder ".", "/srv/comet-labs.dev", :nfs => true
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-
-  config.vm.provider :virtualbox do |vb|
-    vb.name = 'Comet Labs'
-    # To not boot in headless mode:
-    # vb.gui = true
-    # Use VBoxManage to customize the VM. For example to change memory:
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  if data['vm']['hostname'].to_s != ''
+    config.vm.hostname = "#{data['vm']['hostname']}"
   end
 
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file base.pp in the manifests_path directory.
+  if data['vm']['network']['private_network'].to_s != ''
+    config.vm.network "private_network", ip: "#{data['vm']['network']['private_network']}"
+  end
+
+  data['vm']['network']['forwarded_port'].each do |i, port|
+    if port['guest'] != '' && port['host'] != ''
+      config.vm.network :forwarded_port, guest: port['guest'].to_i, host: port['host'].to_i
+    end
+  end
+
+  data['vm']['synced_folder'].each do |i, folder|
+    if folder['source'] != '' && folder['target'] != '' && folder['id'] != ''
+      nfs = (folder['nfs'] == "true") ? "nfs" : nil
+      config.vm.synced_folder "#{folder['source']}", "#{folder['target']}", id: "#{folder['id']}", type: nfs
+    end
+  end
+
+  config.vm.usable_port_range = (10200..10500)
+
+  if !data['vm']['provider']['virtualbox'].empty?
+    config.vm.provider :virtualbox do |virtualbox|
+      virtualbox.name = "Comet Labs"
+      data['vm']['provider']['virtualbox']['modifyvm'].each do |key, value|
+        if key == "natdnshostresolver1"
+          value = value ? "on" : "off"
+        end
+        virtualbox.customize ["modifyvm", :id, "--#{key}", "#{value}"]
+      end
+    end
+  end
+
+  config.vm.provision "shell" do |s|
+    s.path = "puphpet/shell/initial-setup.sh"
+    s.args = "/vagrant/puphpet"
+  end
+  config.vm.provision :shell, :path => "puphpet/shell/update-puppet.sh"
+  config.vm.provision :shell, :path => "puphpet/shell/librarian-puppet-vagrant.sh"
 
   config.vm.provision :puppet do |puppet|
-    puppet.manifests_path = "manifests"
-    puppet.module_path = "modules"
-    # Uncomment the following line to get more verbose vagrant up process
-    # puppet.options = "--verbose --debug"
-    puppet.manifest_file  = "comet-labs.pp"
+    ssh_username = !data['ssh']['username'].nil? ? data['ssh']['username'] : "vagrant"
+    puppet.facter = {
+      "ssh_username" => "#{ssh_username}"
+    }
+    puppet.manifests_path = "#{data['vm']['provision']['puppet']['manifests_path']}"
+    puppet.manifest_file = "#{data['vm']['provision']['puppet']['manifest_file']}"
+
+    if !data['vm']['provision']['puppet']['options'].empty?
+      puppet.options = data['vm']['provision']['puppet']['options']
+    end
   end
+
+  config.vm.provision :shell, :path => "puphpet/shell/execute-files.sh"
+
+  if !data['ssh']['host'].nil?
+    config.ssh.host = "#{data['ssh']['host']}"
+  end
+  if !data['ssh']['port'].nil?
+    config.ssh.port = "#{data['ssh']['port']}"
+  end
+  if !data['ssh']['private_key_path'].nil?
+    config.ssh.private_key_path = "#{data['ssh']['private_key_path']}"
+  end
+  if !data['ssh']['username'].nil?
+    config.ssh.username = "#{data['ssh']['username']}"
+  end
+  if !data['ssh']['guest_port'].nil?
+    config.ssh.guest_port = data['ssh']['guest_port']
+  end
+  if !data['ssh']['shell'].nil?
+    config.ssh.shell = "#{data['ssh']['shell']}"
+  end
+  if !data['ssh']['keep_alive'].nil?
+    config.ssh.keep_alive = data['ssh']['keep_alive']
+  end
+  if !data['ssh']['forward_agent'].nil?
+    config.ssh.forward_agent = data['ssh']['forward_agent']
+  end
+  if !data['ssh']['forward_x11'].nil?
+    config.ssh.forward_x11 = data['ssh']['forward_x11']
+  end
+  if !data['vagrant']['host'].nil?
+    config.vagrant.host = data['vagrant']['host'].gsub(":", "").intern
+  end
+
 end
+

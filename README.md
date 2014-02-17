@@ -15,23 +15,13 @@ Inside your project's directory clone the setup:
 
 ```bash
 git clone git@github.com:cometcult/vagrant-comet-labs.git .puppet
-cd .puppet
-git submodule update --init --recursive
 ```
 
 Create a Vagrantfile and configure manifests and module paths. You can use provided example:
 Please remember to check if your .puppet/ has most recent master branch checked out.
 
 ```bash
-cat .puppet/Vagrantfile |
-    sed -e 's/module_path = "modules"/module_path = ".puppet\/modules"/g' |
-    sed -e 's/manifests_path = "manifests"/manifests_path = ".puppet\/manifests"/g' > Vagrantfile
-```
-
-Add to your /etc/hosts
-
-```bash
-192.168.33.10 comet-labs.dev
+cat .puppet/Vagrantfile | sed -e 's/puphpet\//.puppet\/puphpet\//g' > Vagrantfile
 ```
 
 3) Vagrant
